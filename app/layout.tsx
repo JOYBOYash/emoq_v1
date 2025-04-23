@@ -8,8 +8,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "EmoQ - Stories that feel you",
-  description: "Personalized storytelling that adapts to your emotions in real-time",
-    generator: 'v0.dev'
+  description: "Personalized storytelling that adapts to your emotions in real-time"
 }
 
 export default function RootLayout({

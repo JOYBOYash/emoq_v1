@@ -17,16 +17,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-// Emotion types
+
 type Emotion = "joy" | "sadness" | "surprise" | "anger" | "fear" | "disgust" | "neutral"
 
-// Story segment based on emotion
+
 type StorySegment = {
   emotion: Emotion
   text: string
 }
 
-// Mock story segments for different emotions
+
 const storySegments: Record<Emotion, string[]> = {
   joy: [
     "The sun broke through the clouds, casting golden rays across the meadow. You couldn't help but smile.",

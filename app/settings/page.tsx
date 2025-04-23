@@ -19,7 +19,7 @@ export default function Settings() {
   const [emotionSensitivity, setEmotionSensitivity] = useState([50])
 
   const saveSettings = () => {
-    // Save settings to localStorage
+
     const settings = {
       cameraEnabled,
       storyMode,
@@ -28,7 +28,7 @@ export default function Settings() {
     }
     localStorage.setItem("settings", JSON.stringify(settings))
 
-    // Navigate back to dashboard
+ 
     router.push("/dashboard")
   }
 

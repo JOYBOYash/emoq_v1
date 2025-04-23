@@ -22,13 +22,13 @@ export default function Dashboard() {
   const [recentStories, setRecentStories] = useState<StoryCard[]>([])
 
   useEffect(() => {
-    // Check if permissions are granted
+
     const permissionsGranted = localStorage.getItem("permissionsGranted")
     if (!permissionsGranted) {
       router.push("/permissions")
     }
 
-    // Mock data for recent stories
+
     setRecentStories([
       { id: "1", title: "The Enchanted Forest", date: "2 days ago", emotion: "Joy", emoji: "😊" },
       { id: "2", title: "The Lost City", date: "1 week ago", emotion: "Surprise", emoji: "😲" },

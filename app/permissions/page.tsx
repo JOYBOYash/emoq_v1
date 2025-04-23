@@ -18,7 +18,6 @@ export default function Permissions() {
       stream.getTracks().forEach((track) => track.stop())
       setCameraPermission(true)
 
-      // Check if both permissions are now granted
       if (micPermission === true) {
         localStorage.setItem("permissionsGranted", "true")
         router.push("/dashboard")
@@ -35,7 +34,7 @@ export default function Permissions() {
       stream.getTracks().forEach((track) => track.stop())
       setMicPermission(true)
 
-      // Check if both permissions are now granted
+
       if (cameraPermission === true) {
         localStorage.setItem("permissionsGranted", "true")
         router.push("/dashboard")
@@ -46,16 +45,9 @@ export default function Permissions() {
     }
   }
 
-  // Remove or comment out the checkAllPermissions function since we're now checking directly in each permission request
-  // const checkAllPermissions = () => {
-  //   // If both permissions are granted, proceed to dashboard
-  //   if (cameraPermission && micPermission) {
-  //     localStorage.setItem("permissionsGranted", "true");
-  //     setTimeout(() => router.push("/dashboard"), 1000);
-  //   }
-  // };
 
-  // Add a useEffect to handle the case where both permissions are granted simultaneously
+
+
   useEffect(() => {
     if (cameraPermission === true && micPermission === true) {
       localStorage.setItem("permissionsGranted", "true")
