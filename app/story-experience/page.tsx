@@ -16,53 +16,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-
+import { GoogleGenAI } from "@google/genai"
 
 type Emotion = "joy" | "sadness" | "surprise" | "anger" | "fear" | "disgust" | "neutral"
-
 
 type StorySegment = {
   emotion: Emotion
   text: string
+  tone: string
 }
 
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY })
 
-const storySegments: Record<Emotion, string[]> = {
-  joy: [
-    "The sun broke through the clouds, casting golden rays across the meadow. You couldn't help but smile.",
-    "Children's laughter echoed through the park as colorful balloons danced in the gentle breeze.",
-    "The taste of fresh strawberries brought back memories of carefree summer days and endless possibilities.",
-  ],
-  sadness: [
-    "Rain tapped gently against the window, mirroring the tears that threatened to fall from your eyes.",
-    "The empty house felt larger somehow, each room filled with echoes of what once was.",
-    "Letters, never sent, piled on the desk - words that would never reach their intended recipient.",
-  ],
-  surprise: [
-    "A door appeared in the middle of the forest, its ornate handle gleaming with an invitation to the unknown.",
-    "The package arrived unmarked, and inside was exactly what you had been dreaming of but never told anyone.",
-    "The old map revealed a hidden passage that wasn't there yesterday, promising adventure and mystery.",
-  ],
-  anger: [
-    "The betrayal burned like fire in your veins, demanding justice that seemed forever out of reach.",
-    "Words spoken in haste created walls that seemed impossible to tear down.",
-    "The injustice of the situation fueled a determination to fight against all odds.",
-  ],
-  fear: [
-    "Shadows stretched longer as the sun set, and something seemed to move just beyond your field of vision.",
-    "The old house creaked and groaned as if telling secrets you weren't sure you wanted to hear.",
-    "Each step deeper into the cave took you further from safety and closer to the unknown darkness.",
-  ],
-  disgust: [
-    "The once beautiful garden had been overtaken by decay, nature reclaiming what humans had abandoned.",
-    "Corruption had seeped into every corner of the institution, leaving nothing untainted by greed.",
-    "What was once pure had been twisted into something unrecognizable, a perversion of its former self.",
-  ],
-  neutral: [
-    "The path continued ahead, neither inviting nor threatening, simply existing as a way forward.",
-    "Clouds drifted across the sky, changing shape with the wind's direction.",
-    "The routine of daily life continued, a comfortable rhythm in an unpredictable world.",
-  ],
+const emotions: Emotion[] = ["joy", "sadness", "surprise", "anger", "fear", "disgust", "neutral"]
+
+// Define tone mappings for emotions
+const toneMap: Record<Emotion, string> = {
+  joy: "cheerful",
+  sadness: "melancholic",
+  surprise: "mysterious",
+  anger: "intense",
+  fear: "suspenseful",
+  disgust: "disgusting",
+  neutral: "neutral",
 }
 
 export default function StoryExperience() {
@@ -74,6 +50,20 @@ export default function StoryExperience() {
   const [isPaused, setIsPaused] = useState(false)
   const [showExitDialog, setShowExitDialog] = useState(false)
   const [emotionHistory, setEmotionHistory] = useState<StorySegment[]>([])
+
+  // Function to fetch story segment from Gemini AI
+  const fetchStorySegment = async (emotion: Emotion, tone: string) => {
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: `Generate a short two-lines story segment for the emotion: ${emotion} in the tone: ${tone} to suit the emotion of the user`,
+      })
+      return response.text
+    } catch (error) {
+      console.error("Error fetching story segment from Gemini AI:", error)
+      return "Something went wrong while generating the story."
+    }
+  }
 
   // Simulate emotion detection
   useEffect(() => {
@@ -93,20 +83,21 @@ export default function StoryExperience() {
     startCamera()
 
     // Simulate emotion detection with random emotions
-    const emotions: Emotion[] = ["joy", "sadness", "surprise", "anger", "fear", "disgust", "neutral"]
-
     if (!isPaused) {
-      timer = setInterval(() => {
+      timer = setInterval(async () => {
         // Random emotion detection simulation
         const newEmotion = emotions[Math.floor(Math.random() * emotions.length)]
         setCurrentEmotion(newEmotion)
 
-        // Add story segment based on emotion
-        const newSegment = storySegments[newEmotion][Math.floor(Math.random() * storySegments[newEmotion].length)]
-        setStoryText((prev) => prev + " " + newSegment)
+        // Fetch the tone based on the detected emotion
+        const tone = toneMap[newEmotion]
 
-        // Track emotion history
-        setEmotionHistory((prev) => [...prev, { emotion: newEmotion, text: newSegment }])
+        // Fetch the story segment from Gemini AI
+        const newSegment = await fetchStorySegment(newEmotion, tone)
+
+        // Update story text and history
+        setStoryText((prev) => prev + " " + newSegment)
+        setEmotionHistory((prev) => [...prev, { emotion: newEmotion, text: newSegment, tone }])
 
         // Update progress (max 100)
         setStoryProgress((prev) => Math.min(prev + 5, 100))
