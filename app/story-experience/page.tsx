@@ -27,43 +27,43 @@ type StorySegment = {
 }
 
 
-const storySegments: Record<Emotion, string[]> = {
-  joy: [
-    "The sun broke through the clouds, casting golden rays across the meadow. You couldn't help but smile.",
-    "Children's laughter echoed through the park as colorful balloons danced in the gentle breeze.",
-    "The taste of fresh strawberries brought back memories of carefree summer days and endless possibilities.",
-  ],
-  sadness: [
-    "Rain tapped gently against the window, mirroring the tears that threatened to fall from your eyes.",
-    "The empty house felt larger somehow, each room filled with echoes of what once was.",
-    "Letters, never sent, piled on the desk - words that would never reach their intended recipient.",
-  ],
-  surprise: [
-    "A door appeared in the middle of the forest, its ornate handle gleaming with an invitation to the unknown.",
-    "The package arrived unmarked, and inside was exactly what you had been dreaming of but never told anyone.",
-    "The old map revealed a hidden passage that wasn't there yesterday, promising adventure and mystery.",
-  ],
-  anger: [
-    "The betrayal burned like fire in your veins, demanding justice that seemed forever out of reach.",
-    "Words spoken in haste created walls that seemed impossible to tear down.",
-    "The injustice of the situation fueled a determination to fight against all odds.",
-  ],
-  fear: [
-    "Shadows stretched longer as the sun set, and something seemed to move just beyond your field of vision.",
-    "The old house creaked and groaned as if telling secrets you weren't sure you wanted to hear.",
-    "Each step deeper into the cave took you further from safety and closer to the unknown darkness.",
-  ],
-  disgust: [
-    "The once beautiful garden had been overtaken by decay, nature reclaiming what humans had abandoned.",
-    "Corruption had seeped into every corner of the institution, leaving nothing untainted by greed.",
-    "What was once pure had been twisted into something unrecognizable, a perversion of its former self.",
-  ],
-  neutral: [
-    "The path continued ahead, neither inviting nor threatening, simply existing as a way forward.",
-    "Clouds drifted across the sky, changing shape with the wind's direction.",
-    "The routine of daily life continued, a comfortable rhythm in an unpredictable world.",
-  ],
-}
+// const storySegments: Record<Emotion, string[]> = {
+//   joy: [
+//     "The sun broke through the clouds, casting golden rays across the meadow. You couldn't help but smile.",
+//     "Children's laughter echoed through the park as colorful balloons danced in the gentle breeze.",
+//     "The taste of fresh strawberries brought back memories of carefree summer days and endless possibilities.",
+//   ],
+//   sadness: [
+//     "Rain tapped gently against the window, mirroring the tears that threatened to fall from your eyes.",
+//     "The empty house felt larger somehow, each room filled with echoes of what once was.",
+//     "Letters, never sent, piled on the desk - words that would never reach their intended recipient.",
+//   ],
+//   surprise: [
+//     "A door appeared in the middle of the forest, its ornate handle gleaming with an invitation to the unknown.",
+//     "The package arrived unmarked, and inside was exactly what you had been dreaming of but never told anyone.",
+//     "The old map revealed a hidden passage that wasn't there yesterday, promising adventure and mystery.",
+//   ],
+//   anger: [
+//     "The betrayal burned like fire in your veins, demanding justice that seemed forever out of reach.",
+//     "Words spoken in haste created walls that seemed impossible to tear down.",
+//     "The injustice of the situation fueled a determination to fight against all odds.",
+//   ],
+//   fear: [
+//     "Shadows stretched longer as the sun set, and something seemed to move just beyond your field of vision.",
+//     "The old house creaked and groaned as if telling secrets you weren't sure you wanted to hear.",
+//     "Each step deeper into the cave took you further from safety and closer to the unknown darkness.",
+//   ],
+//   disgust: [
+//     "The once beautiful garden had been overtaken by decay, nature reclaiming what humans had abandoned.",
+//     "Corruption had seeped into every corner of the institution, leaving nothing untainted by greed.",
+//     "What was once pure had been twisted into something unrecognizable, a perversion of its former self.",
+//   ],
+//   neutral: [
+//     "The path continued ahead, neither inviting nor threatening, simply existing as a way forward.",
+//     "Clouds drifted across the sky, changing shape with the wind's direction.",
+//     "The routine of daily life continued, a comfortable rhythm in an unpredictable world.",
+//   ],
+// }
 
 export default function StoryExperience() {
   const router = useRouter()
@@ -76,58 +76,192 @@ export default function StoryExperience() {
   const [emotionHistory, setEmotionHistory] = useState<StorySegment[]>([])
 
   // Simulate emotion detection
-  useEffect(() => {
-    let timer: NodeJS.Timeout
+  // useEffect(() => {
+  //   let timer: NodeJS.Timeout
 
-    const startCamera = async () => {
-      try {
-        if (videoRef.current) {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-          videoRef.current.srcObject = stream
-        }
-      } catch (error) {
-        console.error("Error accessing camera:", error)
+  //   const startCamera = async () => {
+  //     try {
+  //       if (videoRef.current) {
+  //         const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+  //         videoRef.current.srcObject = stream
+  //       }
+  //     } catch (error) {
+  //       console.error("Error accessing camera:", error)
+  //     }
+  //   }
+
+  //   startCamera()
+
+  //   // Simulate emotion detection with random emotions
+  //   const emotions: Emotion[] = ["joy", "sadness", "surprise", "anger", "fear", "disgust", "neutral"]
+
+  //   if (!isPaused) {
+  //     timer = setInterval(() => {
+  //       // Random emotion detection simulation
+  //       const newEmotion = emotions[Math.floor(Math.random() * emotions.length)]
+  //       setCurrentEmotion(newEmotion)
+
+  //       // Add story segment based on emotion
+  //       const newSegment = storySegments[newEmotion][Math.floor(Math.random() * storySegments[newEmotion].length)]
+  //       setStoryText((prev) => prev + " " + newSegment)
+
+  //       // Track emotion history
+  //       setEmotionHistory((prev) => [...prev, { emotion: newEmotion, text: newSegment }])
+
+  //       // Update progress (max 100)
+  //       setStoryProgress((prev) => Math.min(prev + 5, 100))
+
+  //       // End story when progress reaches 100
+  //       if (storyProgress >= 100) {
+  //         clearInterval(timer)
+  //         endStory()
+  //       }
+  //     }, 5000) // Change emotion every 5 seconds
+  //   }
+
+  //   return () => {
+  //     clearInterval(timer)
+  //     // Stop camera when component unmounts
+  //     if (videoRef.current && videoRef.current.srcObject) {
+  //       const stream = videoRef.current.srcObject as MediaStream
+  //       stream.getTracks().forEach((track) => track.stop())
+  //     }
+  //   }
+  // }, [isPaused, storyProgress])
+
+  // Actual emotion detection with webcam
+// useEffect(() => {
+//   let timer: NodeJS.Timeout
+
+//   const startCamera = async () => {
+//     try {
+//       if (videoRef.current) {
+//         const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+//         videoRef.current.srcObject = stream
+//       }
+//     } catch (error) {
+//       console.error("Error accessing camera:", error)
+//     }
+//   }
+
+//   startCamera()
+
+//   if (!isPaused) {
+//     timer = setInterval(async () => {
+//       if (videoRef.current) {
+//         // 1. Capture frame from webcam
+//         const canvas = document.createElement('canvas')
+//         canvas.width = videoRef.current.videoWidth
+//         canvas.height = videoRef.current.videoHeight
+//         const ctx = canvas.getContext('2d')
+//         if (ctx) {
+//           ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+//           const imageBase64 = canvas.toDataURL('image/jpeg')
+
+//           // 2. Send frame to backend API
+//           const response = await fetch('/api/detectEmotion', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ imageBase64 })
+//           })
+//           const data = await response.json()
+
+//           // 3. Update current emotion with API response
+//           const newEmotion = (data.emotion || "neutral") as Emotion
+//           setCurrentEmotion(newEmotion)
+
+//           // 4. Add story segment based on detected emotion
+//           const newSegment = storySegments[newEmotion][Math.floor(Math.random() * storySegments[newEmotion].length)]
+//           setStoryText((prev) => prev + " " + newSegment)
+//           setEmotionHistory((prev) => [...prev, { emotion: newEmotion, text: newSegment }])
+
+//           // 5. Progress update
+//           setStoryProgress((prev) => Math.min(prev + 5, 100))
+
+//           if (storyProgress >= 100) {
+//             clearInterval(timer)
+//             endStory()
+//           }
+//         }
+//       }
+//     }, 5000) // Every 5 seconds
+//   }
+
+//   return () => {
+//     clearInterval(timer)
+//     if (videoRef.current && videoRef.current.srcObject) {
+//       const stream = videoRef.current.srcObject as MediaStream
+//       stream.getTracks().forEach((track) => track.stop())
+//     }
+//   }
+// }, [isPaused, storyProgress])
+
+useEffect(() => {
+  let timer;
+
+  const startCamera = async () => {
+    try {
+      if (videoRef.current) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
       }
+    } catch (error) {
+      console.error("Error accessing camera:", error);
     }
+  };
 
-    startCamera()
+  startCamera();
 
-    // Simulate emotion detection with random emotions
-    const emotions: Emotion[] = ["joy", "sadness", "surprise", "anger", "fear", "disgust", "neutral"]
+  if (!isPaused) {
+    timer = setInterval(async () => {
+      if (videoRef.current) {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = videoRef.current.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+          const imageBase64 = canvas.toDataURL('image/jpeg');
 
-    if (!isPaused) {
-      timer = setInterval(() => {
-        // Random emotion detection simulation
-        const newEmotion = emotions[Math.floor(Math.random() * emotions.length)]
-        setCurrentEmotion(newEmotion)
+          try {
+            const response = await fetch('http://localhost:3000/api/detectEmotion', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ imageBase64 })
+            });
+            const data = await response.json();
 
-        // Add story segment based on emotion
-        const newSegment = storySegments[newEmotion][Math.floor(Math.random() * storySegments[newEmotion].length)]
-        setStoryText((prev) => prev + " " + newSegment)
+            if (data.emotion && data.story) {
+              const newEmotion = data.emotion;
+              const newSegment = data.story;
 
-        // Track emotion history
-        setEmotionHistory((prev) => [...prev, { emotion: newEmotion, text: newSegment }])
+              setCurrentEmotion(newEmotion);
+              setStoryText((prev) => prev + " " + newSegment);
+              setEmotionHistory((prev) => [...prev, { emotion: newEmotion, text: newSegment }]);
+              setStoryProgress((prev) => Math.min(prev + 5, 100));
 
-        // Update progress (max 100)
-        setStoryProgress((prev) => Math.min(prev + 5, 100))
-
-        // End story when progress reaches 100
-        if (storyProgress >= 100) {
-          clearInterval(timer)
-          endStory()
+              if (storyProgress >= 100) {
+                clearInterval(timer);
+                endStory();
+              }
+            }
+          } catch (error) {
+            console.error("Error detecting emotion:", error);
+          }
         }
-      }, 5000) // Change emotion every 5 seconds
-    }
-
-    return () => {
-      clearInterval(timer)
-      // Stop camera when component unmounts
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream
-        stream.getTracks().forEach((track) => track.stop())
       }
+    }, 5000);
+  }
+
+  return () => {
+    clearInterval(timer);
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject;
+      stream.getTracks().forEach((track) => track.stop());
     }
-  }, [isPaused, storyProgress])
+  };
+}, [isPaused, storyProgress]);
+
 
   const togglePause = () => {
     setIsPaused(!isPaused)
@@ -174,7 +308,7 @@ export default function StoryExperience() {
     const emojiMap: Record<Emotion, string> = {
       joy: "😊",
       sadness: "😢",
-      surprise: "😲",
+      surprise: "😮",
       anger: "😠",
       fear: "😨",
       disgust: "🤢",
@@ -182,6 +316,7 @@ export default function StoryExperience() {
     }
     return emojiMap[emotion]
   }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-500 to-indigo-700 text-white">
@@ -217,7 +352,7 @@ export default function StoryExperience() {
               className="bg-white/20 backdrop-blur-md rounded-full px-6 py-3 text-center"
             >
               <p className="text-lg">
-                You seem {currentEmotion} {getEmotionEmoji(currentEmotion)}
+                You seem  {currentEmotion.charAt(0).toUpperCase() + currentEmotion.slice(1)} {getEmotionEmoji(currentEmotion)}
               </p>
             </motion.div>
 
