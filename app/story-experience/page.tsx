@@ -94,23 +94,76 @@ export default function StoryExperience() {
   }
 
   // Function to fetch story segment from Gemini AI
+  // const fetchStorySegment = async (emotion: Emotion, tone: string, previousSegment: string) => {
+  //   try {
+  //     const prompt = previousSegment
+  //       ? `do not respond to this prompt as an model, you're now a story teller and you only have to respond for the story by Continuing the following story segment smoothly based on the user's current emotion.\n\nPrevious Segment: "${previousSegment}"\n\nNow, generate the next short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
+  //       : `do not respond to this prompt as an model, you're now a story teller and you only have to respond for the story by Start a new short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
+
+  //     const response = await ai.models.generateContent({
+  //       model: "gemini-2.0-flash",
+  //       contents: prompt,
+  //     })
+
+  //     return response.text
+  //   } catch (error) {
+  //     console.error("Error fetching story segment from Gemini AI:", error)
+  //     return "Something went wrong while generating the story."
+  //   }
+  // }
+
+
   const fetchStorySegment = async (emotion: Emotion, tone: string, previousSegment: string) => {
     try {
+      // Build the prompt based on whether there is a previous segment or not
       const prompt = previousSegment
-        ? `do not respond to this prompt as an model, you're now a story teller and you only have to respond for the story by Continuing the following story segment smoothly based on the user's current emotion.\n\nPrevious Segment: "${previousSegment}"\n\nNow, generate the next short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
-        : `do not respond to this prompt as an model, you're now a story teller and you only have to respond for the story by Start a new short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents: prompt,
-      })
-
-      return response.text
+        ? `You are a creative storyteller. Continue the following story segment smoothly based on the user's current emotion.\n\nPrevious Segment: "${previousSegment}"\n\nNow, generate the next short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
+        : `You are a creative storyteller. Start a new short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`;
+  
+      // Send POST request to Groq API
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`, // Make sure your Groq API key is securely stored
+        },
+        body: JSON.stringify({
+          model: "llama3-8b-8192", // or "llama3-70b-8192" based on your preference
+          messages: [
+            {
+              role: "system",
+              content: "You are a helpful assistant that writes creative, emotional, two-line story segments."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          temperature: 0.7,  // Controls creativity. 0.7 is a good balance.
+          max_tokens: 150,   // Two lines is around 50–100 tokens, so 150 is safe.
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0
+        })
+      });
+  
+      const data = await response.json();
+  
+      // Check if response is okay
+      if (!response.ok) {
+        console.error("Groq API Error:", data);
+        return "Something went wrong while generating the story.";
+      }
+  
+      // Return the generated text
+      return data.choices[0]?.message?.content?.trim() || "No story segment generated.";
+      
     } catch (error) {
-      console.error("Error fetching story segment from Gemini AI:", error)
-      return "Something went wrong while generating the story."
+      console.error("Error fetching story segment from Groq AI:", error);
+      return "Something went wrong while generating the story.";
     }
-  }
+  };
+  
 
   // Helper function to scroll to element by ID
   const scrollToElement = (id: string) => {
@@ -162,6 +215,62 @@ export default function StoryExperience() {
       return () => clearTimeout(timer)
     }
   }, [storyProgress])
+
+
+// Animate progress bar
+// useEffect(() => {
+//   let animationFrameId: number;
+
+//   const animateProgress = () => {
+//     setAnimatedProgress(prev => {
+//       if (prev < storyProgress) {
+//         animationFrameId = requestAnimationFrame(animateProgress);
+//         return Math.min(prev + 0.5, storyProgress);
+//       }
+//       return prev;
+//     });
+//   };
+
+//   if (storyProgress > animatedProgress) {
+//     animationFrameId = requestAnimationFrame(animateProgress);
+//   }
+
+//   return () => cancelAnimationFrame(animationFrameId);
+// }, [storyProgress]);
+
+// // Show progress increment animation
+// useEffect(() => {
+//   if (storyProgress > 0) {
+//     setProgressIncrement(true)
+//     const timer = setTimeout(() => setProgressIncrement(false), 1500)
+//     return () => clearTimeout(timer)
+//   }
+// }, [storyProgress]);
+
+
+// Animate progress bar smoothly whenever storyProgress changes
+useEffect(() => {
+  let animationFrameId: number;
+
+  const animateProgress = () => {
+    setAnimatedProgress(prev => {
+      if (prev < storyProgress) {
+        animationFrameId = requestAnimationFrame(animateProgress);
+        return Math.min(prev + 0.5, storyProgress);
+      }
+      return prev; // no more animation needed
+    });
+  };
+
+  // Start animation
+  animationFrameId = requestAnimationFrame(animateProgress);
+
+  // Cleanup function to cancel animation if component unmounts or storyProgress changes
+  return () => cancelAnimationFrame(animationFrameId);
+
+}, [storyProgress]);
+
+
 
   // Effect to scroll to current segment when it changes
   useEffect(() => {
