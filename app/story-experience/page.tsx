@@ -434,6 +434,7 @@ useEffect(() => {
 
   const endStory = () => {
     try {
+      window.speechSynthesis.cancel();
       const story = {
         id: Date.now().toString(),
         title: "Your Emotional Journey",
@@ -441,6 +442,7 @@ useEffect(() => {
         text: storyText,
         emotions: emotionHistory,
         dominantEmotion: getMostFrequentEmotion(),
+         // Cancel any ongoing speech
       }
   
       // Save to localStorage first
@@ -449,6 +451,7 @@ useEffect(() => {
   
       // Then navigate with a slight delay to ensure localStorage is updated
       setTimeout(() => {
+        window.speechSynthesis.cancel(), // Cancel any ongoing speech
         router.push(`/story-summary?id=${story.id}`)
       }, 100);
     } catch (error) {

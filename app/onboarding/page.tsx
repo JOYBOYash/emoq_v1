@@ -11,18 +11,18 @@ const slides = [
   {
     title: "Welcome to EmoQ",
     description: "Discover stories that adapt to your emotions in real-time, creating a truly personalized experience.",
-    image: "/placeholder.svg?height=300&width=300",
+    image: "../aplogo.png",
   },
   {
     title: "Emotion Detection",
     description:
       "Our app uses your camera to detect emotions as you read. Don't worry, we never store your video data and prioritize your privacy.",
-    image: "/placeholder.svg?height=300&width=300",
+    image: "../aplogo.png",
   },
   {
     title: "Personalized Storytelling",
     description: "Watch as stories transform based on your emotional responses, creating a unique journey every time.",
-    image: "/placeholder.svg?height=300&width=300",
+    image: "../aplogo.png",
   },
 ]
 
