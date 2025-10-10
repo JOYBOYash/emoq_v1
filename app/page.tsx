@@ -33,25 +33,26 @@ export default function SplashScreen() {
         transition={{ duration: 0.8 }}
         className="flex flex-col items-center"
       >
-        <div className="relative w-40 h-40 mb-6">
-          <Image src="/placeholder.svg?height=160&width=160" alt="EmoQ Logo" fill className="object-contain" priority />
+        <div className="relative w-80 h-32">
+          <Image src="/aplogo.png" alt="EmoQ Logo" fill className="object-fill h-32 w-80" priority />
         </div>
-        <motion.h1
-          className="text-4xl font-bold mb-2"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          EmoQ
-        </motion.h1>
+   
         <motion.p
-          className="text-xl mb-8"
+          className="text-xl mb-2"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
           Stories that feel you.
         </motion.p>
+             <motion.h1
+          className="text-md font-bold mb-2 text-black/30"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+         An App by JoyBoy
+        </motion.h1>
         {loading && (
           <motion.div
             className="w-16 h-16 border-t-4 border-white rounded-full animate-spin"

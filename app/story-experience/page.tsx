@@ -61,6 +61,7 @@ const speakText = (text: string): Promise<void> => {
 }
 
 export default function StoryExperience() {
+
   const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null)
   const storyContainerRef = useRef<HTMLDivElement>(null)
@@ -93,26 +94,6 @@ export default function StoryExperience() {
     setTimeout(() => setShowNotification(false), 2000)
   }
 
-  // Function to fetch story segment from Gemini AI
-  // const fetchStorySegment = async (emotion: Emotion, tone: string, previousSegment: string) => {
-  //   try {
-  //     const prompt = previousSegment
-  //       ? `do not respond to this prompt as an model, you're now a story teller and you only have to respond for the story by Continuing the following story segment smoothly based on the user's current emotion.\n\nPrevious Segment: "${previousSegment}"\n\nNow, generate the next short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
-  //       : `do not respond to this prompt as an model, you're now a story teller and you only have to respond for the story by Start a new short two-lines story segment in a ${tone} tone to suit the emotion: ${emotion}.`
-
-  //     const response = await ai.models.generateContent({
-  //       model: "gemini-2.0-flash",
-  //       contents: prompt,
-  //     })
-
-  //     return response.text
-  //   } catch (error) {
-  //     console.error("Error fetching story segment from Gemini AI:", error)
-  //     return "Something went wrong while generating the story."
-  //   }
-  // }
-
-
   const fetchStorySegment = async (emotion: Emotion, tone: string, previousSegment: string) => {
     try {
       // Build the prompt based on whether there is a previous segment or not
@@ -128,7 +109,7 @@ export default function StoryExperience() {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`, // Make sure your Groq API key is securely stored
         },
         body: JSON.stringify({
-          model: "llama3-8b-8192", // or "llama3-70b-8192" based on your preference
+          model: "llama-3.1-8b-instant", // or "llama3-70b-8192" based on your preference
           messages: [
             {
               role: "system",
@@ -217,37 +198,6 @@ export default function StoryExperience() {
   }, [storyProgress])
 
 
-// Animate progress bar
-// useEffect(() => {
-//   let animationFrameId: number;
-
-//   const animateProgress = () => {
-//     setAnimatedProgress(prev => {
-//       if (prev < storyProgress) {
-//         animationFrameId = requestAnimationFrame(animateProgress);
-//         return Math.min(prev + 0.5, storyProgress);
-//       }
-//       return prev;
-//     });
-//   };
-
-//   if (storyProgress > animatedProgress) {
-//     animationFrameId = requestAnimationFrame(animateProgress);
-//   }
-
-//   return () => cancelAnimationFrame(animationFrameId);
-// }, [storyProgress]);
-
-// // Show progress increment animation
-// useEffect(() => {
-//   if (storyProgress > 0) {
-//     setProgressIncrement(true)
-//     const timer = setTimeout(() => setProgressIncrement(false), 1500)
-//     return () => clearTimeout(timer)
-//   }
-// }, [storyProgress]);
-
-
 // Animate progress bar smoothly whenever storyProgress changes
 useEffect(() => {
   let animationFrameId: number;
@@ -305,15 +255,93 @@ useEffect(() => {
       }
     }
   }, [])
+  
 
-  // Initialize story once on component mount
-  useEffect(() => {
-    // Only start the story once and when not paused
-    if (!isStoryInitializedRef.current && !isPaused && !isProcessingRef.current) {
-      isStoryInitializedRef.current = true;
-      processNextSegment();
+  // Function to handle page switch with proper cleanup and reload
+const handlePageSwitch = (targetPath: string) => {
+  // Cleanup all resources first
+  
+  // Set a flag in sessionStorage to indicate we're switching from story page
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem('fromStoryPage', 'true');
+  }
+  
+  // Navigate to the target path
+  router.push(targetPath);
+  
+  // Force a reload after navigation to ensure clean state
+  setTimeout(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem('fromStoryPage') === 'true') {
+      sessionStorage.removeItem('fromStoryPage');
+      window.location.reload();
     }
-  }, [isPaused]);
+  }, 100);
+}
+  // Comprehensive cleanup on unmount or route change
+  useEffect(() => {
+    return () => {
+      // Cancel speech synthesis
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      
+      // Stop camera/video stream
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          track.enabled = false;
+        });
+        videoRef.current.srcObject = null;
+      }
+      
+      // Reset all refs
+      isProcessingRef.current = false;
+      isSpeakingRef.current = false;
+      cameraInitializedRef.current = false;
+      isStoryInitializedRef.current = false;
+    };
+  }, []);
+
+// Only start the story ONCE (fixes duplicate segments)
+  useEffect(() => {
+    // Add a small delay to ensure all refs are properly initialized
+    const initTimer = setTimeout(() => {
+      if (!isStoryInitializedRef.current && !isPaused && !isProcessingRef.current) {
+        isStoryInitializedRef.current = true;
+        processNextSegment();
+      }
+    }, 500);
+
+    return () => clearTimeout(initTimer);
+    // eslint-disable-next-line
+  }, []); // only run on mount
+
+  // Comprehensive cleanup on unmount or route change
+  useEffect(() => {
+    return () => {
+      // Cancel speech synthesis
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      
+      // Stop camera/video stream
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          track.enabled = false;
+        });
+        videoRef.current.srcObject = null;
+      }
+      
+      // Reset all refs
+      isProcessingRef.current = false;
+      isSpeakingRef.current = false;
+      cameraInitializedRef.current = false;
+      isStoryInitializedRef.current = false;
+    };
+  }, []);
 
   // Process next segment when unpaused
   useEffect(() => {
@@ -452,12 +480,12 @@ useEffect(() => {
       // Then navigate with a slight delay to ensure localStorage is updated
       setTimeout(() => {
         window.speechSynthesis.cancel(), // Cancel any ongoing speech
-        router.push(`/story-summary?id=${story.id}`)
+     handlePageSwitch(`/story-summary?id=${story.id}`)
       }, 100);
     } catch (error) {
       console.error("Error saving story:", error);
       // Fallback navigation if there's an error
-      router.push('/dashboard');
+   handlePageSwitch('/dashboard');
     }
   }
 
@@ -790,7 +818,7 @@ useEffect(() => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="text-purple-500">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => router.push("/dashboard")}>Exit</AlertDialogAction>
+            <AlertDialogAction onClick={() => handlePageSwitch("/dashboard")}>Exit</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
